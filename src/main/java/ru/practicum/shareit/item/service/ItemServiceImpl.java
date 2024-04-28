@@ -8,7 +8,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemStorage itemStorage;
-    private final UserStorage userStorage;
     private final ItemMapper itemMapper;
+    private final UserService userService;
 
     @Override
     public ItemDto createItem(int userId, ItemDto itemDto) {
@@ -56,7 +56,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItemsByText(int userId, String text) {
-        userStorage.getUserById(userId);
+        userService.getUserById(userId);
         if (text.isBlank()) {
             return List.of();
         }
@@ -66,8 +66,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void checkUserInData(int userId) {
-        userStorage.getUserById(userId)
-                .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден"));
+        userService.getUserById(userId);
     }
 
     private void updateItemFromDto(Item item, ItemDto itemDto) {
