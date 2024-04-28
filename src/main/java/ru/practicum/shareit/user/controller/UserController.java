@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -17,23 +18,23 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> getUsers() {
-        return userService.getUsers();
+    public ResponseEntity<List<UserDto>> getUsers() {
+        return ResponseEntity.ok().body(userService.getUsers());
     }
 
     @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable int id) {
-        return userService.getUserById(id);
+    public ResponseEntity<UserDto> getUserById(@PathVariable int id) {
+        return ResponseEntity.ok().body(userService.getUserById(id));
     }
 
     @PostMapping
-    public UserDto create(@Validated(Create.class) @RequestBody UserDto userDto) {
-        return userService.createUser(userDto);
+    public ResponseEntity<UserDto> create(@Validated(Create.class) @RequestBody UserDto userDto) {
+        return ResponseEntity.ok().body(userService.createUser(userDto));
     }
 
     @PatchMapping("/{id}")
-    public UserDto update(@PathVariable int id, @Validated(Update.class) @RequestBody UserDto userDto) {
-        return userService.update(id, userDto);
+    public ResponseEntity<UserDto> update(@PathVariable int id, @Validated(Update.class) @RequestBody UserDto userDto) {
+        return ResponseEntity.ok().body(userService.update(id, userDto));
     }
 
     @DeleteMapping("/{id}")

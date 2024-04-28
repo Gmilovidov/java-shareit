@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -19,29 +20,29 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader(USER_ID) int userId, @Validated(Create.class) @RequestBody ItemDto itemDto) {
-        return itemService.createItem(userId, itemDto);
+    public ResponseEntity<ItemDto> createItem(@RequestHeader(USER_ID) int userId, @Validated(Create.class) @RequestBody ItemDto itemDto) {
+        return ResponseEntity.ok().body(itemService.createItem(userId, itemDto));
     }
 
     @GetMapping
-    public List<ItemDto> getItems(@RequestHeader(USER_ID) int userId) {
-        return itemService.getItems(userId);
+    public ResponseEntity<List<ItemDto>> getItems(@RequestHeader(USER_ID) int userId) {
+        return ResponseEntity.ok().body(itemService.getItems(userId));
     }
 
     @GetMapping("/{id}")
-    public ItemDto getItemById(@RequestHeader(USER_ID) int userId, @PathVariable int id) {
-        return itemService.getItemById(userId, id);
+    public ResponseEntity<ItemDto> getItemById(@RequestHeader(USER_ID) int userId, @PathVariable int id) {
+        return ResponseEntity.ok().body(itemService.getItemById(userId, id));
     }
 
     @PatchMapping("/{id}")
-    public ItemDto update(@RequestHeader(USER_ID) int userId, @PathVariable int id,
-                          @Validated(Update.class) @RequestBody ItemDto itemDto) {
-        return itemService.update(userId, id, itemDto);
+    public ResponseEntity<ItemDto> update(@RequestHeader(USER_ID) int userId, @PathVariable int id,
+                                          @Validated(Update.class) @RequestBody ItemDto itemDto) {
+        return ResponseEntity.ok().body(itemService.update(userId, id, itemDto));
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getItemsByText(@RequestHeader(USER_ID) int userId,
+    public ResponseEntity<List<ItemDto>> getItemsByText(@RequestHeader(USER_ID) int userId,
                                         @RequestParam (value = "text") String text) {
-        return itemService.getItemsByText(userId, text);
+        return ResponseEntity.ok().body(itemService.getItemsByText(userId, text));
     }
 }
