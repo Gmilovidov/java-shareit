@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
 import ru.practicum.shareit.exceptions.WrongIdException;
-import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.user.storage.UserStorage;
@@ -23,7 +23,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto createItem(int userId, ItemDto itemDto) {
         checkUserInData(userId);
-        Item item = itemMapper.createItemFromDto(userId, itemDto);
+        Item item = itemMapper.createItemFromDto(itemDto);
         return itemMapper.getItemDto(itemStorage.createItem(userId, item));
     }
 
@@ -50,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
         if (item.getOwnerId() != userId) {
             throw new WrongIdException("У вещи с id=" + id + " владелец");
         }
-        item = itemMapper.updateItemFromDto(item, itemDto);
+        updateItemFromDto(item, itemDto);
         return itemMapper.getItemDto(itemStorage.update(userId, id, item));
     }
 
@@ -68,5 +68,17 @@ public class ItemServiceImpl implements ItemService {
     private void checkUserInData(int userId) {
         userStorage.getUserById(userId)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден"));
+    }
+
+    private void updateItemFromDto(Item item, ItemDto itemDto) {
+        if (itemDto.getName() != null && !itemDto.getName().isBlank()) {
+            item.setName(itemDto.getName());
+        }
+        if (itemDto.getDescription() != null && !itemDto.getDescription().isBlank()) {
+            item.setDescription(itemDto.getDescription());
+        }
+        if (itemDto.getAvailable() != null) {
+            item.setAvailable(itemDto.getAvailable());
+        }
     }
 }

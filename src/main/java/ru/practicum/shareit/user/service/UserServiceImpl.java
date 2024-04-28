@@ -3,7 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
-import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
@@ -41,12 +41,22 @@ public class UserServiceImpl implements UserService {
     public UserDto update(int id, UserDto userDto) {
         User user = User.buildUser(userStorage.getUserById(id)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + id + " не найден")));
-        user = userMapper.updateUserFromDto(user, userDto);
+        user = updateUserFromDto(user, userDto);
         return userMapper.getUserDto(userStorage.update(id, user));
     }
 
     @Override
     public void delete(int id) {
         userStorage.delete(id);
+    }
+
+    public User updateUserFromDto(User user, UserDto userDto) {
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            user.setEmail(userDto.getEmail());
+        }
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            user.setName(userDto.getName());
+        }
+        return user;
     }
 }
