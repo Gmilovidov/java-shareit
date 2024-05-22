@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.validateGroup.Create;
@@ -44,5 +45,12 @@ public class ItemController {
     public ResponseEntity<List<ItemDto>> getItemsByText(@RequestHeader(USER_ID) Long userId,
                                         @RequestParam (value = "text") String text) {
         return ResponseEntity.ok().body(itemService.getItemsByText(userId, text));
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public ResponseEntity<CommentDto> createComment(@RequestHeader(USER_ID) Long userId,
+                                                    @PathVariable Long itemId,
+                                                    @Validated(Create.class) @RequestBody CommentDto commentDto) {
+        return ResponseEntity.ok().body(itemService.createComment(userId, itemId, commentDto));
     }
 }
