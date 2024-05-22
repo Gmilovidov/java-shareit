@@ -56,8 +56,8 @@ public class ItemServiceImpl implements ItemService {
                     Booking lastBooking = findLastBooking(item.getId());
                     Booking nextBooking = findNextBooking(item.getId());
                     return itemMapper.getItemDto(item,
-                            bookingMapper.getBookingDto(lastBooking),
-                            bookingMapper.getBookingDto(nextBooking),
+                            bookingMapper.getBookingDto(lastBooking, lastBooking.getBooker()),
+                            bookingMapper.getBookingDto(nextBooking, nextBooking.getBooker()),
                             findComments(item.getId()));
                 })
                 .sorted(Comparator.comparingLong(ItemDto::getId))
@@ -74,8 +74,8 @@ public class ItemServiceImpl implements ItemService {
 
         if (userId.equals(item.getOwner().getId())) {
            return itemMapper.getItemDto(item,
-                   bookingMapper.getBookingDto(lastBooking),
-                   bookingMapper.getBookingDto(nextBookings),
+                   bookingMapper.getBookingDto(lastBooking, lastBooking.getBooker()),
+                   bookingMapper.getBookingDto(nextBookings, nextBookings.getBooker()),
                    findComments(id));
         }
 
@@ -95,8 +95,8 @@ public class ItemServiceImpl implements ItemService {
         }
         itemMapper.updateItemFromDto(item, itemDto);
         return itemMapper.getItemDto(itemRepository.save(item),
-                bookingMapper.getBookingDto(findLastBooking(id)),
-                bookingMapper.getBookingDto(findNextBooking(id)),
+                bookingMapper.getBookingDto(findLastBooking(id), findLastBooking(id).getBooker()),
+                bookingMapper.getBookingDto(findNextBooking(id), findNextBooking(id).getBooker()),
                 findComments(id));
     }
 

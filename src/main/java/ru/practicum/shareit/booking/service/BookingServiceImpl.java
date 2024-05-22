@@ -137,6 +137,11 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findAllByItemId(itemId);
     }
 
+    @Override
+    public List<Booking> getAllBookingByParams(Long itemId, Long bookerId, BookingStatus status) {
+        return bookingRepository.findAllByItem_IdAndBooker_IdAndStatus(itemId, bookerId, status);
+    }
+
     private List<BookingDtoOut> getDtoOutListBookings(List<Booking> bookings) {
         List<BookingDtoOut> bookingDtoOuts = new ArrayList<>();
         for (Booking b : bookings) {
