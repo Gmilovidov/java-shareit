@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Builder
 public class BookingDtoOut {
     private Long id;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private ItemDto item;
     private UserDto booker;
     private BookingStatus status;

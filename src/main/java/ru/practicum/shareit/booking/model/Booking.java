@@ -21,7 +21,7 @@ public class Booking {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "holder_id", referencedColumnName = "id")
+    @JoinColumn(name = "booker_id", referencedColumnName = "id")
     private User booker;
 
     @OneToOne(fetch = FetchType.LAZY)
