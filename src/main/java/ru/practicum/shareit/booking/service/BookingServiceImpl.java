@@ -75,7 +75,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDtoOut> getAllBooker(Long userId, String state) {
         userService.getUserByIdWithoutDto(userId);
-       if(state == null) {
+       if (state == null) {
            return bookingMapper.getDtoOutList(bookingRepository
                    .findAllByBooker_IdOrderByStartTimeDesc(userId));
        }
