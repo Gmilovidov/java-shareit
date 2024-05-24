@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.service.BookingService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static ru.practicum.shareit.constants.CustomHeaders.USER_ID;
@@ -19,26 +20,27 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingDtoOut> create(@RequestHeader(USER_ID) Long bookerId,
-                                               @RequestBody BookingDtoIn bookingDtoIn) {
+                                               @Valid @RequestBody BookingDtoIn bookingDtoIn) {
         return ResponseEntity.ok().body(bookingService.create(bookerId, bookingDtoIn));
     }
 
     @PatchMapping("/{bookingId}")
     public ResponseEntity<BookingDtoOut> updateStatus(@RequestHeader(USER_ID) Long ownerId,
-                                      @PathVariable Long bookingId,
-                                      @RequestParam("approved") Boolean isApproved) {
+                                                      @PathVariable Long bookingId,
+                                                      @RequestParam(value = "approved") Boolean isApproved) {
         return ResponseEntity.ok().body(bookingService.updateStatus(ownerId, bookingId, isApproved));
     }
 
-    @GetMapping("/bookingId")
+    @GetMapping("/{bookingId}")
     public ResponseEntity<BookingDtoOut> getBooking(@RequestHeader(USER_ID) Long userId,
-                                    @PathVariable Long bookingId) {
+                                                    @PathVariable Long bookingId) {
         return ResponseEntity.ok().body(bookingService.getBooking(userId, bookingId));
     }
 
     @GetMapping
     public ResponseEntity<List<BookingDtoOut>> getAllBooker(@RequestHeader(USER_ID) Long userId,
-                                                            @RequestParam(defaultValue = "ALL") String state) {
+                                                            @RequestParam(value = "state",
+                                                                    defaultValue = "ALL") String state) {
         return ResponseEntity.ok().body(bookingService.getAllBooker(userId, state));
     }
 

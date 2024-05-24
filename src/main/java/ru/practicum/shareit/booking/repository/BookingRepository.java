@@ -12,18 +12,6 @@ import java.util.List;
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findAllByItem_IdInOrderByStartTimeDesc(List<Long> itemIds);
-
-    List<Booking> findAllByItem_IdInAndStatusInOrderByStartTimeDesc(List<Long> itemIds, List<BookingStatus> status);
-
-    List<Booking> findAllByBooker_IdAndStatusOrderByStartTimeDesc(long bookerId, BookingStatus status);
-
-    List<Booking> findAllByBooker_IdOrderByStartTimeDesc(long bookerId);
-
-    List<Booking> findAllByItemId(Long itemId);
-
-    List<Booking> findAllByItem_IdAndBooker_IdAndStatus(Long itemId, Long bookerId, BookingStatus status);
-
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = ?1 " +
             "AND b.startTime <= ?2 " +
@@ -45,6 +33,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ORDER BY b.startTime DESC")
     List<Booking> readAllBookerFutureBookings(long bookerId, LocalDateTime now);
 
+    List<Booking> findAllByBooker_IdAndStatusOrderByStartTimeDesc(long bookerId, BookingStatus status);
+
+    List<Booking> findAllByBooker_IdOrderByStartTimeDesc(long bookerId);
+
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.id IN ?1 " +
             "AND b.startTime <= ?2 " +
@@ -65,4 +57,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "AND b.endTime >= ?2 " +
             "ORDER BY b.startTime DESC")
     List<Booking> readAllOwnerItemsFutureBookings(List<Long> itemIds, LocalDateTime now);
+
+    List<Booking> findAllByItem_IdInOrderByStartTimeDesc(List<Long> itemIds);
+
+    List<Booking> findAllByItem_IdInAndStatusInOrderByStartTimeDesc(List<Long> itemIds, List<BookingStatus> status);
+
+    List<Booking> findAllByItem_IdAndBooker_IdAndStatus(Long itemId, Long bookerId, BookingStatus status);
+
+    List<Booking> findAllByItemId(Long itemId);
 }

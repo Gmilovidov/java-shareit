@@ -21,7 +21,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,8 +36,6 @@ public class ItemServiceImpl implements ItemService {
     private final BookingService bookingService;
     private final CommentRepository commentRepository;
 
-
-
     @Override
     public ItemDto createItem(Long userId, ItemDto itemDto) {
         User user = userService.getUserByIdWithoutDto(userId);
@@ -50,20 +47,18 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getItems(Long userId) {
         userService.getUserByIdWithoutDto(userId);
-
         return itemRepository.findAllByOwnerId(userId).stream()
                 .map(item -> {
                     Booking lastBooking = findLastBooking(item.getId());
                     Booking nextBooking = findNextBooking(item.getId());
                     return itemMapper.getItemDto(item,
-                            bookingMapper.getBookingDto(lastBooking, lastBooking.getBooker()),
-                            bookingMapper.getBookingDto(nextBooking, nextBooking.getBooker()),
+                            bookingMapper.getBookingDto(lastBooking),
+                            bookingMapper.getBookingDto(nextBooking),
                             findComments(item.getId()));
                 })
                 .sorted(Comparator.comparingLong(ItemDto::getId))
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public ItemDto getItemById(Long userId, Long id) {
@@ -74,8 +69,8 @@ public class ItemServiceImpl implements ItemService {
 
         if (userId.equals(item.getOwner().getId())) {
            return itemMapper.getItemDto(item,
-                   bookingMapper.getBookingDto(lastBooking, lastBooking.getBooker()),
-                   bookingMapper.getBookingDto(nextBookings, nextBookings.getBooker()),
+                   bookingMapper.getBookingDto(lastBooking),
+                   bookingMapper.getBookingDto(nextBookings),
                    findComments(id));
         }
 
@@ -93,10 +88,10 @@ public class ItemServiceImpl implements ItemService {
         if (!userId.equals(item.getOwner().getId())) {
             throw new WrongIdException("Вещь с id=" + id + " не принадлежит пользователю с id = " + userId);
         }
-        itemMapper.updateItemFromDto(item, itemDto);
+        item = itemMapper.updateItemFromDto(item, itemDto);
         return itemMapper.getItemDto(itemRepository.save(item),
-                bookingMapper.getBookingDto(findLastBooking(id), findLastBooking(id).getBooker()),
-                bookingMapper.getBookingDto(findNextBooking(id), findNextBooking(id).getBooker()),
+                bookingMapper.getBookingDto(findLastBooking(id)),
+                bookingMapper.getBookingDto(findNextBooking(id)),
                 findComments(id));
     }
 
@@ -143,7 +138,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = getItemByIdWithoutDto(itemId);
         commentDto.setCreated(LocalDateTime.now());
         Comment comment = commentMapper.getCommentFromDto(commentDto, item, user);
-        return commentMapper.getCommentDto(commentRepository.save(comment), comment.getAuthor());
+        return commentMapper.getCommentDto(commentRepository.save(comment));
     }
 
     private Booking findLastBooking(Long itemId) {
@@ -166,24 +161,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private List<CommentDto> findComments(Long itemId) {
-        List<Comment> comments = commentRepository.findAllByItemId(itemId);
-        List<CommentDto> commentDtos = new ArrayList<>();
-        for (Comment com : comments) {
-            commentDtos.add(commentMapper.getCommentDto(com, com.getAuthor()));
-        }
-        return commentDtos;
+        return commentRepository.findAllByItemId(itemId).stream()
+                .map(commentMapper::getCommentDto)
+                .collect(Collectors.toList());
     }
-
-//    private void updateItemFromDto(Item item, ItemDto itemDto) {
-//        if (itemDto.getName() != null && !itemDto.getName().isBlank()) {
-//            item.setName(itemDto.getName());
-//        }
-//        if (itemDto.getDescription() != null && !itemDto.getDescription().isBlank()) {
-//            item.setDescription(itemDto.getDescription());
-//        }
-//        if (itemDto.getAvailable() != null) {
-//            item.setAvailable(itemDto.getAvailable());
-//        }
-//    }
 }
 

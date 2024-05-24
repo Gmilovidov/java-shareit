@@ -1,8 +1,10 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
+import ru.practicum.shareit.exceptions.DuplicateDataException;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -32,8 +34,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        User user = userMapper.createUserDto(userDto);
-        return userMapper.getUserDto(userRepository.save(user));
+        try {
+            User user = userMapper.createUserDto(userDto);
+            return userMapper.getUserDto(userRepository.save(user));
+        } catch (ConstraintViolationException exception) {
+            throw new DuplicateDataException(exception.getMessage());
+        }
+
+
     }
 
     @Override
