@@ -9,12 +9,15 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.*;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +28,8 @@ public class BookingServiceImpl implements BookingService {
     private final UserService userService;
     private final ItemRepository itemRepository;
     private final BookingMapper bookingMapper;
+    private final ItemMapper itemMapper;
+    private final UserMapper userMapper;
 
     @Override
     public BookingDtoOut create(Long bookerId, BookingDtoIn bookingDtoIn) {
@@ -38,7 +43,9 @@ public class BookingServiceImpl implements BookingService {
             throw new AvailableException("Вещь забронирована");
         }
         Booking booking = bookingMapper.getBookingFromDto(bookingDtoIn, item, booker, BookingStatus.WAITING);
-        return bookingMapper.getBookingDtoOut(bookingRepository.save(booking));
+        return bookingMapper.getBookingDtoOut(bookingRepository.save(booking),
+                itemMapper.getItemDto(booking.getItem(), null, null, null),
+                userMapper.getUserDto(booking.getBooker()));
     }
 
     @Override
@@ -55,7 +62,9 @@ public class BookingServiceImpl implements BookingService {
             throw new WrongStatusException("Нельзя изменить статус вещи");
         }
         booking.setStatus(isApproved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        return bookingMapper.getBookingDtoOut(bookingRepository.save(booking));
+        return bookingMapper.getBookingDtoOut(bookingRepository.save(booking),
+                itemMapper.getItemDto(booking.getItem(), null, null, null),
+                userMapper.getUserDto(booking.getBooker()));
     }
 
     @Override
@@ -69,35 +78,37 @@ public class BookingServiceImpl implements BookingService {
         if (!checkBookingUser) {
             throw new DataNotFoundException("Для пользователя  с id = " + userId + "  бронь не найдена");
         }
-        return bookingMapper.getBookingDtoOut(booking);
+        return bookingMapper.getBookingDtoOut(booking,
+                itemMapper.getItemDto(booking.getItem(), null, null, null),
+                userMapper.getUserDto(booking.getBooker()));
     }
 
     @Override
     public List<BookingDtoOut> getAllBooker(Long userId, String state) {
         userService.getUserByIdWithoutDto(userId);
        if (state == null) {
-           return bookingMapper.getDtoOutList(bookingRepository
+           return getDtoOutList(bookingRepository
                    .findAllByBooker_IdOrderByStartTimeDesc(userId));
        }
 
         switch (state.toUpperCase()) {
             case "CURRENT":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .readAllBookerCurrentBookings(userId, LocalDateTime.now()));
             case "PAST":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .readAllBookerPastBookings(userId, LocalDateTime.now()));
             case "FUTURE":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .readAllBookerFutureBookings(userId, LocalDateTime.now()));
             case "WAITING":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .findAllByBooker_IdAndStatusOrderByStartTimeDesc(userId, BookingStatus.WAITING));
             case "REJECTED":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .findAllByBooker_IdAndStatusOrderByStartTimeDesc(userId, BookingStatus.REJECTED));
             case "ALL":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .findAllByBooker_IdOrderByStartTimeDesc(userId));
             default:
                 throw new WrongStatusException("Unknown state: UNSUPPORTED_STATUS");
@@ -112,22 +123,22 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
         switch (state.toUpperCase()) {
             case "CURRENT":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .readAllOwnerItemsCurrentBookings(ids, LocalDateTime.now()));
             case "PAST":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .readAllOwnerItemsPastBookings(ids, LocalDateTime.now()));
             case "FUTURE":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .readAllOwnerItemsFutureBookings(ids, LocalDateTime.now()));
             case "WAITING":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .findAllByItem_IdInAndStatusInOrderByStartTimeDesc(ids, List.of(BookingStatus.WAITING)));
             case "REJECTED":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .findAllByItem_IdInAndStatusInOrderByStartTimeDesc(ids, List.of(BookingStatus.REJECTED)));
             case "ALL":
-                return bookingMapper.getDtoOutList(bookingRepository
+                return getDtoOutList(bookingRepository
                         .findAllByItem_IdInOrderByStartTimeDesc(ids));
             default:
                 throw new WrongStatusException("Unknown state: UNSUPPORTED_STATUS");
@@ -148,5 +159,15 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getAllBookingByParams(Long itemId, Long bookerId, BookingStatus status) {
         return bookingRepository.findAllByItem_IdAndBooker_IdAndStatus(itemId, bookerId, status);
+    }
+
+    private List<BookingDtoOut> getDtoOutList(List<Booking> bookingList) {
+        List<BookingDtoOut> dtoOut = new ArrayList<>();
+        for (Booking b : bookingList) {
+            dtoOut.add(bookingMapper.getBookingDtoOut(b,
+                    itemMapper.getItemDto(b.getItem(), null, null, null),
+                    userMapper.getUserDto(b.getBooker())));
+        }
+        return dtoOut;
     }
 }
