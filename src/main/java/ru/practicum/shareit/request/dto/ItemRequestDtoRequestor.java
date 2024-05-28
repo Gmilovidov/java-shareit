@@ -3,17 +3,17 @@ package ru.practicum.shareit.request.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.shareit.validateGroup.Create;
+import ru.practicum.shareit.item.dto.ItemDtoForRequest;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Getter
 @Setter
-public class ItemRequestDto {
+public class ItemRequestDtoRequestor {
     private Long id;
-    @NotNull(groups = Create.class)
     private String description;
     private LocalDateTime created;
+    private List<ItemDtoForRequest> items;
 }

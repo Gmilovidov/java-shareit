@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
@@ -84,62 +86,67 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoOut> getAllBooker(Long userId, String state) {
+    public List<BookingDtoOut> getAllBooker(Long userId, String state, Integer start, Integer size) {
         userService.getUserByIdWithoutDto(userId);
-       if (state == null) {
-           return getDtoOutList(bookingRepository
-                   .findAllByBooker_IdOrderByStartTimeDesc(userId));
-       }
+//       if (state == null) {
+//           return getDtoOutList(bookingRepository
+//                   .findAllByBooker_IdOrderByStartTimeDesc(userId));
+//       }
+
+        Pageable pageable = PageRequest.of(start / size, size);
 
         switch (state.toUpperCase()) {
             case "CURRENT":
                 return getDtoOutList(bookingRepository
-                        .readAllBookerCurrentBookings(userId, LocalDateTime.now()));
+                        .readAllBookerCurrentBookings(userId, LocalDateTime.now(), pageable));
             case "PAST":
                 return getDtoOutList(bookingRepository
-                        .readAllBookerPastBookings(userId, LocalDateTime.now()));
+                        .readAllBookerPastBookings(userId, LocalDateTime.now(), pageable));
             case "FUTURE":
                 return getDtoOutList(bookingRepository
-                        .readAllBookerFutureBookings(userId, LocalDateTime.now()));
+                        .readAllBookerFutureBookings(userId, LocalDateTime.now(), pageable));
             case "WAITING":
                 return getDtoOutList(bookingRepository
-                        .findAllByBooker_IdAndStatusOrderByStartTimeDesc(userId, BookingStatus.WAITING));
+                        .findAllByBooker_IdAndStatusOrderByStartTimeDesc(userId, BookingStatus.WAITING, pageable));
             case "REJECTED":
                 return getDtoOutList(bookingRepository
-                        .findAllByBooker_IdAndStatusOrderByStartTimeDesc(userId, BookingStatus.REJECTED));
+                        .findAllByBooker_IdAndStatusOrderByStartTimeDesc(userId, BookingStatus.REJECTED, pageable));
             case "ALL":
                 return getDtoOutList(bookingRepository
-                        .findAllByBooker_IdOrderByStartTimeDesc(userId));
+                        .findAllByBooker_IdOrderByStartTimeDesc(userId, pageable));
             default:
                 throw new WrongStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
 
     @Override
-    public List<BookingDtoOut> getAllOwnerItem(Long ownerId, String state) {
+    public List<BookingDtoOut> getAllOwnerItem(Long ownerId, String state, Integer start, Integer size) {
         userService.getUserByIdWithoutDto(ownerId);
+        Pageable pageable = PageRequest.of(start / size, size);
         List<Long> ids = itemRepository.findAllByOwnerId(ownerId).stream()
                 .map(Item::getId)
                 .collect(Collectors.toList());
         switch (state.toUpperCase()) {
             case "CURRENT":
                 return getDtoOutList(bookingRepository
-                        .readAllOwnerItemsCurrentBookings(ids, LocalDateTime.now()));
+                        .readAllOwnerItemsCurrentBookings(ids, LocalDateTime.now(), pageable));
             case "PAST":
                 return getDtoOutList(bookingRepository
-                        .readAllOwnerItemsPastBookings(ids, LocalDateTime.now()));
+                        .readAllOwnerItemsPastBookings(ids, LocalDateTime.now(), pageable));
             case "FUTURE":
                 return getDtoOutList(bookingRepository
-                        .readAllOwnerItemsFutureBookings(ids, LocalDateTime.now()));
+                        .readAllOwnerItemsFutureBookings(ids, LocalDateTime.now(), pageable));
             case "WAITING":
                 return getDtoOutList(bookingRepository
-                        .findAllByItem_IdInAndStatusInOrderByStartTimeDesc(ids, List.of(BookingStatus.WAITING)));
+                        .findAllByItem_IdInAndStatusInOrderByStartTimeDesc(ids,
+                                List.of(BookingStatus.WAITING), pageable));
             case "REJECTED":
                 return getDtoOutList(bookingRepository
-                        .findAllByItem_IdInAndStatusInOrderByStartTimeDesc(ids, List.of(BookingStatus.REJECTED)));
+                        .findAllByItem_IdInAndStatusInOrderByStartTimeDesc(ids,
+                                List.of(BookingStatus.REJECTED), pageable));
             case "ALL":
                 return getDtoOutList(bookingRepository
-                        .findAllByItem_IdInOrderByStartTimeDesc(ids));
+                        .findAllByItem_IdInOrderByStartTimeDesc(ids, pageable));
             default:
                 throw new WrongStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
