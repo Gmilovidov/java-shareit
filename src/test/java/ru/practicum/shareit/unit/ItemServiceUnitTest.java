@@ -54,7 +54,7 @@ public class ItemServiceUnitTest {
     void beforeEach() {
         itemMapper = new ItemMapper();
         bookingMapper = new BookingMapperImpl();
-        commentMapper = new CommentMapper();
+//        commentMapper = new CommentMapperImpl();
 
         ReflectionTestUtils.setField(itemService, "itemMapper", itemMapper);
         ReflectionTestUtils.setField(itemService, "commentMapper", commentMapper);
