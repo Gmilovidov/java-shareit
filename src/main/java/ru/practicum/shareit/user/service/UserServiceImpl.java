@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.DataNotFoundException;
-import ru.practicum.shareit.exceptions.DuplicateDataException;
+import ru.practicum.shareit.exceptions.WrongIdException;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
             User user = userMapper.createUserDto(userDto);
             return userMapper.getUserDto(userRepository.save(user));
         } catch (ConstraintViolationException exception) {
-            throw new DuplicateDataException(exception.getMessage());
+            throw new WrongIdException(exception.getMessage());
         }
 
 
@@ -54,14 +54,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(Long id) {
-        getUserByIdWithoutDto(id);
-        userRepository.deleteById(id);
-    }
-
-    @Override
-    public User getUserByIdWithoutDto(Long id) {
-        return userRepository.findById(id)
+        userRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + id + " не найден"));
+        userRepository.deleteById(id);
     }
 
     public User updateUserFromDto(User user, UserDto userDto) {
