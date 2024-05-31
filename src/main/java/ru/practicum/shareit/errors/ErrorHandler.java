@@ -39,8 +39,10 @@ public class ErrorHandler {
         log.info(errors.toString());
         return errors;
     }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({MissingRequestHeaderException.class, AvailableException.class, WrongStatusException.class})
+    @ExceptionHandler({MissingRequestHeaderException.class,
+            AvailableException.class, WrongStatusException.class})
     public ErrorResponse handleWrongRequestException(final RuntimeException e) {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
