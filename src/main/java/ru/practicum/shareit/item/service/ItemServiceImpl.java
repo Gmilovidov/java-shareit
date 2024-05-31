@@ -161,7 +161,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Booking findNextBooking(Long itemId) {
-        List<Booking> itemBookings =bookingRepository.findAllByItemId(itemId);
+        List<Booking> itemBookings = bookingRepository.findAllByItemId(itemId);
         return itemBookings.stream()
                 .filter(booking -> booking.getStartTime().isAfter(LocalDateTime.now()))
                 .filter(booking -> booking.getStatus().equals(BookingStatus.APPROVED))

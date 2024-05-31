@@ -29,6 +29,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRepository itemRepository;
     private final ItemRequestMapper itemRequestMapper;
     private final ItemMapper itemMapper;
+
     @Override
     public ItemRequestDto createRequest(Long requestorId, ItemRequestDto itemRequestDto) {
         User user = userRepository.findById(requestorId)
