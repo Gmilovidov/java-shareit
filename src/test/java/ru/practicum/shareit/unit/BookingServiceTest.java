@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class BookingServiceUnitTest {
+public class BookingServiceTest {
     @InjectMocks
     private BookingServiceImpl bookingService;
     @Mock

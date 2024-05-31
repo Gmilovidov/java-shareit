@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceUnitTest {
+public class UserServiceTest {
     @InjectMocks
     private UserServiceImpl userService;
     @Mock
