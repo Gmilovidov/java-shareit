@@ -26,12 +26,6 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-//    @ExceptionHandler(WrongStatusException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public Map<String, String> handleWrongStatusException(final WrongStatusException e) {
-//        return Map.of("error", e.getMessage());
-//    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleMethodArgumentNotValidException(
@@ -60,11 +54,4 @@ public class ErrorHandler {
         log.error(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
-
-//    @ExceptionHandler(AvailableException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public Map<String, String> handleValidationException(final AvailableException e) {
-//        return Map.of("error", e.getMessage());
-//    }
-
 }

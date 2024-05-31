@@ -1,26 +1,3 @@
-//package ru.practicum.shareit.request.mapper;
-//
-//import org.mapstruct.Mapper;
-//import org.mapstruct.Mapping;
-//import ru.practicum.shareit.item.dto.ItemDtoForRequest;
-//import ru.practicum.shareit.request.dto.ItemRequestDto;
-//import ru.practicum.shareit.request.dto.ItemRequestDtoRequestor;
-//import ru.practicum.shareit.request.model.ItemRequest;
-//import ru.practicum.shareit.user.model.User;
-//
-//import java.util.List;
-//
-//@Mapper(componentModel = "spring")
-//public interface ItemRequestMapper {
-//
-//    @Mapping(target = "items", ignore = true)
-//    @Mapping(target = "id", source = "itemRequestDto.id")
-//    ItemRequest getRequestFromDto(ItemRequestDto itemRequestDto, User requestor);
-//
-//    ItemRequestDto getRequestDto(ItemRequest itemRequest);
-//
-//    ItemRequestDtoRequestor getRequestDtoRequestor(ItemRequest itemRequest, List<ItemDtoForRequest> items);
-//}
 package ru.practicum.shareit.request.mapper;
 
 import org.springframework.stereotype.Component;

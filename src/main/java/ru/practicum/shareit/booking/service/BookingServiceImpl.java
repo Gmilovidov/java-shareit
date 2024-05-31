@@ -16,6 +16,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingMapper bookingMapper;
     private final ItemMapper itemMapper;
@@ -35,7 +36,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDtoOut create(Long bookerId, BookingDtoIn bookingDtoIn) {
-        User booker = userService.getUserByIdWithoutDto(bookerId);
+        User booker =  userRepository.findById(bookerId)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + bookerId + " не найден"));
         Item item = itemRepository.findById(bookingDtoIn.getItemId())
                 .orElseThrow(() -> new DataNotFoundException("Вещи с id=" + bookingDtoIn.getItemId() + " нет."));
         if (bookerId.equals(item.getOwner().getId())) {
@@ -52,7 +54,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDtoOut updateStatus(Long ownerId, Long bookingId, Boolean isApproved) {
-        userService.getUserByIdWithoutDto(ownerId);
+        userRepository.findById(ownerId)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + ownerId + " не найден"));
         Booking booking = getBookingByIdWithoutDto(bookingId);
         itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
                 new DataNotFoundException("Вещь не найдена"));
@@ -60,7 +63,7 @@ public class BookingServiceImpl implements BookingService {
            throw new WrongAccessException("Нельзя изменить статус брони вещи, пользователю, с ids "
                    + bookingId + " и " + ownerId + " соответственно");
         }
-        if (isApproved && booking.getStatus() == BookingStatus.APPROVED) {
+        if (!booking.getStatus().equals(BookingStatus.WAITING)) {
             throw new WrongStatusException("Нельзя изменить статус вещи");
         }
         booking.setStatus(isApproved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
@@ -71,7 +74,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDtoOut getBooking(Long userId, Long bookingId) {
-        userService.getUserByIdWithoutDto(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден"));
         Booking booking = getBookingByIdWithoutDto(bookingId);
         itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
                 new DataNotFoundException("Вещь не найдена"));
@@ -87,11 +91,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDtoOut> getAllBooker(Long userId, String state, Integer start, Integer size) {
-        userService.getUserByIdWithoutDto(userId);
-//       if (state == null) {
-//           return getDtoOutList(bookingRepository
-//                   .findAllByBooker_IdOrderByStartTimeDesc(userId));
-//       }
+        userRepository.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + userId + " не найден"));
 
         Pageable pageable = PageRequest.of(start / size, size);
 
@@ -121,7 +122,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDtoOut> getAllOwnerItem(Long ownerId, String state, Integer start, Integer size) {
-        userService.getUserByIdWithoutDto(ownerId);
+        userRepository.findById(ownerId)
+                .orElseThrow(() -> new DataNotFoundException("Пользователь с id=" + ownerId + " не найден"));
         Pageable pageable = PageRequest.of(start / size, size);
         List<Long> ids = itemRepository.findAllByOwnerId(ownerId).stream()
                 .map(Item::getId)
