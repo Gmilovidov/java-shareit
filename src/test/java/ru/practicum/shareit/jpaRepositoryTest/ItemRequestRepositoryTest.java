@@ -22,16 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ItemRequestRepositoryTest {
 
     @Autowired
-    ItemRequestRepository itemRequestRepository;
+    private ItemRequestRepository itemRequestRepository;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    ItemRepository itemRepository;
-    Item item;
-    Item item2;
-    User owner;
-    User requestor;
-    ItemRequest itemRequest;
+    private ItemRepository itemRepository;
+    private Item item;
+    private Item item2;
+    private User owner;
+    private User requestor;
+    private ItemRequest itemRequest;
 
     @BeforeEach
     void beforeEach() {
