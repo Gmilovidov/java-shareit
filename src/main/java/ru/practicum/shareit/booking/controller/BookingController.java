@@ -2,16 +2,19 @@ package ru.practicum.shareit.booking.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 import static ru.practicum.shareit.constants.CustomHeaders.USER_ID;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
@@ -40,13 +43,21 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<List<BookingDtoOut>> getAllBooker(@RequestHeader(USER_ID) Long userId,
                                                             @RequestParam(value = "state",
-                                                                    defaultValue = "ALL") String state) {
-        return ResponseEntity.ok().body(bookingService.getAllBooker(userId, state));
+                                                                    defaultValue = "ALL") String state,
+                                                            @RequestParam(value = "from", defaultValue = "0")
+                                                                @Min(0) Integer from,
+                                                            @RequestParam(value = "size", defaultValue = "10")
+                                                                @Min(1) Integer size) {
+        return ResponseEntity.ok().body(bookingService.getAllBooker(userId, state, from, size));
     }
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingDtoOut>> getAllOwnerItem(@RequestHeader(USER_ID) Long ownerId,
-                                                               @RequestParam(defaultValue = "ALL") String state) {
-        return ResponseEntity.ok().body(bookingService.getAllOwnerItem(ownerId, state));
+                                                               @RequestParam(defaultValue = "ALL") String state,
+                                                               @RequestParam(value = "from", defaultValue = "0")
+                                                               @Min(0) Integer from,
+                                                               @RequestParam(value = "size", defaultValue = "10")
+                                                               @Min(1) Integer size) {
+        return ResponseEntity.ok().body(bookingService.getAllOwnerItem(ownerId, state, from, size));
     }
 }

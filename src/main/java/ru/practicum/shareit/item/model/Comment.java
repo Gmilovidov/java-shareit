@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class Comment {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,11 +21,11 @@ public class Comment {
     @Column(nullable = false)
     private String text;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "item_id", referencedColumnName = "id")
     private Item item;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User author;
 
