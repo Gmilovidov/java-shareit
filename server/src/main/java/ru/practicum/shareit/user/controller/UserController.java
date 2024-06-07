@@ -6,8 +6,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.validateGroup.Create;
-import ru.practicum.shareit.validateGroup.Update;
 
 import java.util.List;
 
@@ -29,12 +27,13 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@Validated(Create.class) @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> create(@RequestBody UserDto userDto) {
         return ResponseEntity.ok().body(userService.createUser(userDto));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserDto> update(@PathVariable Long id, @Validated(Update.class) @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> update(@PathVariable Long id,
+                                          @RequestBody UserDto userDto) {
         return ResponseEntity.ok().body(userService.update(id, userDto));
     }
 

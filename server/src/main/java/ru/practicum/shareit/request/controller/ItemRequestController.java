@@ -7,9 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoRequestor;
 import ru.practicum.shareit.request.service.ItemRequestService;
-import ru.practicum.shareit.validateGroup.Create;
 
-import javax.validation.constraints.Min;
 import java.util.List;
 
 import static ru.practicum.shareit.constants.CustomHeaders.USER_ID;
@@ -23,7 +21,6 @@ public class ItemRequestController {
 
     @PostMapping
     public ResponseEntity<ItemRequestDto> createRequest(@RequestHeader(USER_ID) Long userId,
-                                                        @Validated(Create.class)
                                                         @RequestBody ItemRequestDto itemRequestDto) {
         return ResponseEntity.ok().body(itemRequestService.createRequest(userId, itemRequestDto));
     }
@@ -36,11 +33,9 @@ public class ItemRequestController {
     @GetMapping("/all")
     public ResponseEntity<List<ItemRequestDtoRequestor>> getRequestsByPage(@RequestHeader(USER_ID) Long userId,
                                                                            @RequestParam(value = "from",
-                                                                                   defaultValue = "0")
-                                                                           @Min(0) Integer start,
+                                                                                   defaultValue = "0") Integer start,
                                                                            @RequestParam(value = "size",
-                                                                                   defaultValue = "10")
-                                                                               @Min(1) Integer size) {
+                                                                                   defaultValue = "10") Integer size) {
         return ResponseEntity.ok().body(itemRequestService.getRequestsByPage(userId, start, size));
     }
 

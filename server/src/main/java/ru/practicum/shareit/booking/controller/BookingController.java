@@ -8,8 +8,6 @@ import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.service.BookingService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.List;
 
 import static ru.practicum.shareit.constants.CustomHeaders.USER_ID;
@@ -23,7 +21,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingDtoOut> create(@RequestHeader(USER_ID) Long bookerId,
-                                               @Valid @RequestBody BookingDtoIn bookingDtoIn) {
+                                               @RequestBody BookingDtoIn bookingDtoIn) {
         return ResponseEntity.ok().body(bookingService.create(bookerId, bookingDtoIn));
     }
 
@@ -45,19 +43,17 @@ public class BookingController {
                                                             @RequestParam(value = "state",
                                                                     defaultValue = "ALL") String state,
                                                             @RequestParam(value = "from", defaultValue = "0")
-                                                                @Min(0) Integer from,
+                                                                 Integer from,
                                                             @RequestParam(value = "size", defaultValue = "10")
-                                                                @Min(1) Integer size) {
+                                                                 Integer size) {
         return ResponseEntity.ok().body(bookingService.getAllBooker(userId, state, from, size));
     }
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingDtoOut>> getAllOwnerItem(@RequestHeader(USER_ID) Long ownerId,
                                                                @RequestParam(defaultValue = "ALL") String state,
-                                                               @RequestParam(value = "from", defaultValue = "0")
-                                                               @Min(0) Integer from,
-                                                               @RequestParam(value = "size", defaultValue = "10")
-                                                               @Min(1) Integer size) {
+                                                               @RequestParam(value = "from", defaultValue = "0") Integer from,
+                                                               @RequestParam(value = "size", defaultValue = "10") Integer size) {
         return ResponseEntity.ok().body(bookingService.getAllOwnerItem(ownerId, state, from, size));
     }
 }
